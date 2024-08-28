@@ -1,18 +1,57 @@
 #include <Arduino.h>
+#include <main.h>
+#include <sbus.h>
 
-// put function declarations here:
-int myFunction(int, int);
+
+
+groundStationPacket packet;
+state currState;
+state prevState;
+droneCommand command;
+float t = 0;
+float dt = 0;
 
 void setup() {
   // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  Serial.begin(115200);
+  sbusTx.Begin();
+  t=millis();
+  Serial.println("Hello World");
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+
+  //get ground station packet and state
+
+  if (!getGroundStationPacket(&packet) || !getState(&currState)){
+    
+    //handle shit
+
+  }
+
+
+  switch (packet.mode){
+    case FOLLOW_PATH_MODE:
+      dt = millis() - t;
+      droneControl(packet,currState,prevState,dt,&command);
+      t = millis();
+      break;
+
+      
+    case MANUAL_MODE:
+      //get the command values inside the packet
+      command.thrust=packet.thrust;
+      command.pitch=packet.pitch;
+      command.roll=packet.roll;
+      command.yaw=packet.yaw;
+      break;
+
+    default:
+      break;
+  }
+
+
+  //write to sbus
+  writeSBUS(command);
 }
