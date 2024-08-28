@@ -29,7 +29,6 @@ void loop() {
 
   }
 
-
   switch (packet.mode){
     case FOLLOW_PATH_MODE:
       dt = millis() - t;
@@ -43,14 +42,17 @@ void loop() {
       command.thrust=packet.thrust;
       command.pitch=packet.pitch;
       command.roll=packet.roll;
-      command.yaw=packet.yaw;
+      command.yaw=packet.yaw;      
       break;
 
     default:
       break;
   }
+    
+    
+  if (packet.payloadDeploy){
+    deployPayload(packet.payloadDeploy);
+  }
 
-
-  //write to sbus
   writeSBUS(command);
 }

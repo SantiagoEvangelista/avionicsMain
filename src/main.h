@@ -11,6 +11,8 @@
 #define FOLLOW_PATH_MODE 0
 #define MANUAL_MODE 1
 
+#define PAYLOAD_ONE_PIN 0
+#define PAYLOAD_TWO_PIN 0
 
 
 bfs::SbusTx sbusTx(&Serial2);
@@ -20,7 +22,7 @@ typedef struct {
   int setpointEcefY;
   int setpointEcefZ;
   uint8_t mode;
-  uint8_t payloadStatus;
+  uint8_t payloadDeploy;
   uint8_t thrust;
   uint8_t roll;
   uint8_t pitch;
@@ -48,7 +50,6 @@ typedef struct{
   uint8_t roll;
   uint8_t pitch;
   uint8_t yaw;
-  uint8_t payloadDeploy;
 } droneCommand;
 
 
@@ -63,19 +64,6 @@ void writeSBUS(droneCommand command){
     data.ch[2] = command.pitch;
     data.ch[3] = command.yaw;
     
-    switch (command.payloadDeploy){
-    case 0:
-        break;
-    case 1:
-        data.ch17 = 1;
-        break;
-    case 2:
-        data.ch18 = 1;
-        break;
-    default:
-        break;
-    }
-
     sbusTx.data(data);
     sbusTx.Write();
 };
@@ -92,6 +80,23 @@ droneCommand droneControl(groundStationPacket packet, state currState, state pre
 
 
     //three controllers in total (distance, orientation and altitude)
+}
+
+
+void deployPayload(uint8_t payloadDeploy){
+    switch (payloadDeploy){
+    case 0:
+        break;
+
+    case 1:
+        break;
+    
+    case 2:
+        break;
+    
+    default:
+        break;
+    }
 }
 
 
