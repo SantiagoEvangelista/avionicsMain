@@ -6,8 +6,9 @@
 
 groundStationPacket packet;
 state currState;
-state prevState;
+droneCommand prevCommand={0,0,0,0};
 droneCommand command;
+uint8_t prevThrust = 0;
 float t = 0;
 float dt = 0;
 
@@ -28,11 +29,12 @@ void loop() {
     //handle shit
 
   }
-
+  
+  
   switch (packet.mode){
     case FOLLOW_PATH_MODE:
       dt = millis() - t;
-      droneControl(packet,currState,prevState,dt,&command);
+      prevCommand = droneControl(packet,currState,prevCommand,dt,&command);
       t = millis();
       break;
 
@@ -40,6 +42,18 @@ void loop() {
     case MANUAL_MODE:
       //get the command values inside the packet
       command.thrust=packet.thrust;
+      prevThrust=command.thrust;
+      command.pitch=packet.pitch;
+      command.roll=packet.roll;
+      command.yaw=packet.yaw;      
+      break;
+
+    case MANUAL_ALT_HOLD:
+          //get the command values inside the packet
+      dt = millis() - t;
+      command.thrust = altitudeControl(packet,currState,prevThrust,dt);
+      t = millis();
+      prevThrust = command.thrust;
       command.pitch=packet.pitch;
       command.roll=packet.roll;
       command.yaw=packet.yaw;      

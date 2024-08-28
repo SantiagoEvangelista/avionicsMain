@@ -10,6 +10,7 @@
 
 #define FOLLOW_PATH_MODE 0
 #define MANUAL_MODE 1
+#define MANUAL_ALT_HOLD 2
 
 #define PAYLOAD_ONE_PIN 0
 #define PAYLOAD_TWO_PIN 0
@@ -72,16 +73,35 @@ bool getGroundStationPacket(groundStationPacket* packet);
 
 bool getState(state* currState);
 
-droneCommand droneControl(groundStationPacket packet, state currState, state prevState, float dt, droneCommand* command){
-
+droneCommand droneControl(groundStationPacket packet, state currState, droneCommand prevCommand, float dt, droneCommand* command){
     //align the drone to next waypoint (inside packet) with a controller
     //Once aligned (inside a threshold), go to the point mainting the orientation with a controller
     //all of this maintaining the set altitude (measurement inside currState and setpoint altitude is a parameter) with a controller (inside margin and smoothly)
 
-
+    return *command;
     //three controllers in total (distance, orientation and altitude)
 }
 
+
+
+#define ALTITUDE_MARGIN 0.1
+#define K_ALT 1
+#define KD_ALT 1
+#define KI_ALT 1
+
+uint8_t altitudeControl(groundStationPacket packet, state currState, uint8_t prevThust, float dt){
+
+    uint8_t thrust = 0;
+
+    if ((packet.setpointEcefZ - currState.ecefZ) > ALTITUDE_MARGIN){
+        thrust = K_ALT*(packet.setpointEcefZ - currState.ecefZ) + KD_ALT*(currState.velocityZ) + KI_ALT*(packet.setpointEcefZ - currState.ecefZ)*dt;
+    }
+    else{
+        thrust = prevThust;
+    }
+    
+    return thrust;
+}
 
 void deployPayload(uint8_t payloadDeploy){
     switch (payloadDeploy){
@@ -98,6 +118,7 @@ void deployPayload(uint8_t payloadDeploy){
         break;
     }
 }
+
 
 
 #endif
