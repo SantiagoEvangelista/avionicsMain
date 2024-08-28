@@ -48,6 +48,7 @@ typedef struct{
   uint8_t roll;
   uint8_t pitch;
   uint8_t yaw;
+  uint8_t payloadDeploy;
 } droneCommand;
 
 
@@ -55,6 +56,25 @@ void writeSBUS(droneCommand command){
     bfs::SbusData data;
 
     //convert command into sbus data
+
+    //TODO: TEST THE CHANNELS ORDER
+    data.ch[0] = command.thrust;
+    data.ch[1] = command.roll;
+    data.ch[2] = command.pitch;
+    data.ch[3] = command.yaw;
+    
+    switch (command.payloadDeploy){
+    case 0:
+        break;
+    case 1:
+        data.ch17 = 1;
+        break;
+    case 2:
+        data.ch18 = 1;
+        break;
+    default:
+        break;
+    }
 
     sbusTx.data(data);
     sbusTx.Write();

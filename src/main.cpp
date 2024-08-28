@@ -16,7 +16,6 @@ void setup() {
   Serial.begin(115200);
   sbusTx.Begin();
   t=millis();
-  Serial.println("Hello World");
 }
 
 void loop() {
@@ -38,7 +37,7 @@ void loop() {
       t = millis();
       break;
 
-      
+
     case MANUAL_MODE:
       //get the command values inside the packet
       command.thrust=packet.thrust;
